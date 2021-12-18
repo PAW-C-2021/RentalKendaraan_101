@@ -6,6 +6,7 @@
     <title>@ViewData["Title"] - RentalKendaraan_101</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://kit.fontawesome.com/92b8caa89a.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <header>
@@ -16,13 +17,24 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                <div class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle"data-toggle="dropdown">Daftar Rental<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a asp-area="" asp-controller="Custumers" asp-action="Index">Custumer</a></li>
+                                <li><a asp-area="" asp-controller="Peminjamen" asp-action="Index">Peminjaman</a></li>
+                                <li><a asp-area="" asp-controller="Pengembalians" asp-action="Index">Pengembalian</a></li>
+                                <li><a asp-area="" asp-controller="Kendaraans" asp-action="Index">Kendaraan</a></li>
+                                <li><a asp-area="" asp-controller="JenisKendaraans" asp-action="Index">JenisKendaraan</a></li>
+                                <li><a asp-area="" asp-controller="KondisiKendaraans" asp-action="Index">KondisiKendaraan</a></li>
+                                <li><a asp-area="" asp-controller="Jaminans" asp-action="Index">Jaminan</a></li>
+                                <li><a asp-area="" asp-controller="Genders" asp-action="Index">Gender</a></li>
+                            </ul>
                         </li>
                     </ul>
                 </div>

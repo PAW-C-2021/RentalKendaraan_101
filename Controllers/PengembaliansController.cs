@@ -19,10 +19,53 @@ namespace RentalKendaraan_101.Controllers
         }
 
         // GET: Pengembalians
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string ktsd, string searchString, string sortOrder, string currentFilter, int? pageNumber)
         {
-            var rentKendaraanContext = _context.Pengembalians.Include(p => p.IdKondisiNavigation).Include(p => p.IdPeminjamanNavigation);
-            return View(await rentKendaraanContext.ToListAsync());
+            var ktsdList = new List<string>();
+            var ktsdQuery = from d in _context.Pengembalians orderby d.Denda.ToString() select d.Denda.ToString();
+            ktsdList.AddRange(ktsdQuery.Distinct());
+            ViewBag.ktsd = new SelectList(ktsdList);
+            var menu = from m in _context.Pengembalians.Include(k => k.IdPeminjamanNavigation).Include(k => k.IdKondisiNavigation) select m;
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.Denda.ToString() == ktsd);
+            }
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.TglPengembalian.ToString().Contains(searchString));
+            }
+
+            //ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_decs" : "";
+            //ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "Date" : "";
+
+            switch (sortOrder)
+            {
+                case "Date":
+                    menu = menu.OrderByDescending(s => s.TglPengembalian);
+                    break;
+                default:
+                    menu = menu.OrderBy(s => s.TglPengembalian);
+                    break;
+            }
+            //membuat pagedList
+            ViewData["CurrentSort"] = sortOrder;
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
+
+            //definisi jumlah data pada halaman
+            int pageSize = 5;
+
+            return View(await PaginatedList<Pengembalian>.CreateAsync(menu.AsNoTracking(), pageNumber ?? 1, pageSize));
+            //return View(await menu.ToListAsync());
         }
 
         // GET: Pengembalians/Details/5

@@ -19,12 +19,55 @@ namespace RentalKendaraan_101.Controllers
         }
 
         // GET: Custumers
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string ktsd, string searchString, string sortOrder, string currentFilter, int? pageNumber)
         {
-            var rentKendaraanContext = _context.Custumers.Include(c => c.IdGenderNavigation);
-            return View(await rentKendaraanContext.ToListAsync());
-        }
+            var ktsdList = new List<string>();
+            var ktsdQuery = from d in _context.Custumers orderby d.NamaCutumer select d.NamaCutumer;
 
+            ktsdList.AddRange(ktsdQuery.Distinct());
+            ViewBag.ktsd = new SelectList(ktsdList);
+
+            var menu = from m in _context.Custumers.Include(k => k.IdGenderNavigation) select m;
+
+            if (!string.IsNullOrEmpty(ktsd))
+            {
+                menu = menu.Where(x => x.NamaCutumer == ktsd);
+            }
+
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                menu = menu.Where(s => s.NamaCutumer.Contains(searchString) || s.Nik.Contains(searchString) || s.Alamat.Contains(searchString) ||
+                s.NoHp.Contains(searchString) || s.IdGenderNavigation.NamaGender.Contains(searchString));
+            }
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_decs" : "";
+
+            switch (sortOrder)
+            {
+                case "name_decs":
+                    menu = menu.OrderByDescending(s => s.NamaCutumer);
+                    break;
+                default:
+                    menu = menu.OrderBy(s => s.NamaCutumer);
+                    break;
+            }
+            //membuat pagedList
+            ViewData["CurrentSort"] = sortOrder;
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+            ViewData["CurrentFilter"] = searchString;
+
+            //definisi jumlah data pada halaman
+            int pageSize = 5;
+
+            return View(await PaginatedList<Custumer>.CreateAsync(menu.AsNoTracking(), pageNumber ?? 1, pageSize));
+            //return View(await menu.ToListAsync());
+        }
         // GET: Custumers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
